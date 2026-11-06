@@ -1,26 +1,181 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Theme switching is driven by data-theme on <html> (set before paint by an inline script). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ---------- Dawn (light) palette ---------- */
+:root,
+[data-theme="light"] {
+  --bg: #eef0fb;
+  --bg-deep: #dfe3f7;
+  --fg: #1d1b3a;
+  --muted: #5b5f86;
+  --panel: rgb(255 255 255 / 0.6);
+  --panel-border: rgb(124 92 255 / 0.22);
+  --accent: #7c3aed;
+  --accent-2: #0891b2;
+  --glow: rgb(124 58 237 / 0.25);
+  --glow-2: rgb(8 145 178 / 0.2);
+  --field-bg: rgb(255 255 255 / 0.75);
+  --danger: #c2261d;
+  --warn: #a15c07;
+  --star: 92 80 170;
+  --star-opacity: 0.45;
+  color-scheme: light;
+}
+
+/* ---------- Deep space (dark) palette ---------- */
+[data-theme="dark"] {
+  --bg: #05060f;
+  --bg-deep: #0a0f2c;
+  --fg: #e7e9ff;
+  --muted: #9aa0c8;
+  --panel: rgb(16 20 48 / 0.55);
+  --panel-border: rgb(167 139 250 / 0.22);
+  --accent: #a78bfa;
+  --accent-2: #22d3ee;
+  --glow: rgb(167 139 250 / 0.45);
+  --glow-2: rgb(34 211 238 / 0.35);
+  --field-bg: rgb(4 6 22 / 0.55);
+  --danger: #f87171;
+  --warn: #fbbf24;
+  --star: 255 255 255;
+  --star-opacity: 1;
+  color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-panel: var(--panel);
+  --color-panel-border: var(--panel-border);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-danger: var(--danger);
+  --color-warn: var(--warn);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-orbitron);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--bg);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--fg);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background:
+    radial-gradient(ellipse at 20% 0%, var(--glow) 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 100%, var(--glow-2) 0%, transparent 50%),
+    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg) 100%);
+  background-attachment: fixed;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* Glass card over the starfield */
+@utility glass {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 1rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.02) inset,
+    0 10px 40px -12px var(--glow);
+}
+
+/* Glowing accent button */
+@utility btn-glow {
+  border-radius: 0.75rem;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 18px -4px var(--glow);
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+  &:hover {
+    box-shadow:
+      0 0 26px -2px var(--glow),
+      0 0 12px -4px var(--glow-2);
+    transform: translateY(-1px);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+/* Quiet bordered button (secondary actions) */
+@utility btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--panel-border);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--fg);
+  background: transparent;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+  &:hover:not(:disabled) {
+    border-color: var(--accent);
+    box-shadow: 0 0 12px -2px var(--glow);
+  }
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+/* Text inputs */
+@utility field {
+  width: 100%;
+  border-radius: 0.6rem;
+  border: 1px solid var(--panel-border);
+  background: var(--field-bg);
+  padding: 0.5rem 0.75rem;
+  color: var(--fg);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  &::placeholder {
+    color: var(--muted);
+    opacity: 0.7;
+  }
+  &:focus-visible {
+    border-color: var(--accent-2);
+  }
+  &[aria-invalid="true"] {
+    border-color: var(--danger);
+  }
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+/* Glowing focus rings everywhere */
+:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 2px;
+  box-shadow: 0 0 12px var(--glow-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
 }

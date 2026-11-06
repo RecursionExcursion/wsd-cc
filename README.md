@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cosmic Workspace Deployer 🚀
 
-## Getting Started
+Build a "workspace" — a list of apps, files, and websites — and download a script for
+Windows, macOS, or Linux that opens all of them with one double-click.
 
-First, run the development server:
+Everything runs in your browser. There's no server, database, or account; saved
+workspaces live in your browser's localStorage.
+
+## Run it
 
 ```bash
+npm install     # first time only
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Use it
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Name** your workspace and pick the **target system** (Windows `.bat`, macOS `.command`, Linux `.sh`).
+2. **Add items**: apps/files (paste their full path) or URLs. Reorder with ↑ ↓.
+   Browsers can't read file paths for you, so the app shows how to copy one on each system.
+3. Optionally **pause between launches** (0–2 seconds).
+4. Press **🚀 Launch Workspace** to jump to the script preview, then **Copy** or **Download** it.
+5. Follow the "How to run it" steps shown under the preview.
+6. **💾 Save to Orbit** (or Ctrl/⌘+S) keeps the workspace in the sidebar to edit, duplicate, or delete later.
+   After editing, download the script again — files already on your computer don't update.
+7. **Export all / Import** in the sidebar moves your workspaces between browsers or computers as a JSON file.
+   Importing never deletes anything: new workspaces are added, and an existing one is only replaced
+   by a newer copy.
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Start the app locally with live reload |
+| `npm test` | Run the unit tests once (generators and storage) |
+| `npm run test:watch` | Re-run tests as you edit |
+| `npm run lint` | Check code style and common mistakes |
+| `npm run build` | Production build (what Vercel would run) |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project layout
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+app/                 Page, layout, global styles, tab icon
+components/          UI pieces (editor, item rows, preview, sidebar, theme toggle, starfield)
+lib/generators/      Script generators: windows.ts, macos.ts, linux.ts (+ tests)
+lib/storage.ts       Saving/loading workspaces in localStorage, import/export (+ tests)
+lib/validation.ts    Checks for names, URLs, and paths
+types/workspace.ts   The shape of a workspace
+```
 
-## Deploy on Vercel
+## Notes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Windows scripts** keep `%VARIABLES%` like `%LOCALAPPDATA%` working, double any other `%`,
+  and switch the console to UTF-8 so paths with accents work.
+- **macOS/Linux scripts** turn a leading `~` into `$HOME` (since `~` doesn't expand inside quotes).
+- The app is static and Vercel-compatible: it never touches the server's file system.
